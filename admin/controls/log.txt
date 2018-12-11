@@ -1,0 +1,7 @@
+
+[info] - login. id_peg: 1234567890 di 07-12-2018 10:30:55
+[info] - id_peg:  [tambah opd] uhu di 07-12-2018 10:35:12
+[info] - id_peg:  [hapus data] pada tabel:tb_opddengan id value:5 di 07-12-2018 10:35:43
+[info] - id_peg:  [ubah opd] Dinas Pendidikan dan Kebudayaan di 07-12-2018 10:36:41
+[info] - id_peg: 1234567890 [tambah dataset] Test Datasetdengan id opd:1 di 07-12-2018 10:40:46
+[info] - login. id_peg: 1234567890 di 09-12-2018 14:23:31
