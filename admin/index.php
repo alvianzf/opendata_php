@@ -1,47 +1,47 @@
 <?php
-    include '../config/config.php';
-    include '../functions/sql.php';
+include '../config/config.php';
+include '../functions/sql.php';
 
-    session_start();
+session_start();
 
-    $a = @$_GET['admin'];
+// Check if user is logged in
+if (!isset($_SESSION['log']) || $_SESSION['log'] == '') {
+    header("Location: ../login/");
+    session_destroy();
+    exit();
+}
 
-    if ($_SESSION['log']== '')
-    {
-        header("location:../login/");
-        session_destroy();  
-    }
+// Get the current admin page
+$currentPage = $_GET['admin'] ?? 'dashboard';
 
-    $one  = '';
-    $two = '';
-    $three = '';
-    $four = '';
-    $five = '';
+// Define navigation items and their active states
+$navItems = [
+    'dashboard' => '',
+    'user' => '',
+    'dataset' => '',
+    'forms' => '',
+    'dinas' => ''
+];
 
-    if ($a == 'dashboard')
-    {
-        $one = "active";
+// Set active state for current page
+if (array_key_exists($currentPage, $navItems)) {
+    $navItems[$currentPage] = 'active';
+}
+
+// Function to include view files
+function includeView($viewName) {
+    $viewPath = "view/$viewName.php";
+    if (file_exists($viewPath)) {
+        include $viewPath;
+    } else {
+        echo "<h1>404 Page Not Found</h1>";
     }
-    else if ($a =='user')
-    {
-        $two = "active";
-    }
-    else if ($a =='dataset')
-    {
-        $three = "active";
-    }
-    else if ($a =='forms')
-    {
-        $four = "active";
-    }else if ($a =='dinas')
-    {
-        $five = "active";
-    }
+}
+
 ?>
 
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,36 +51,25 @@
     <link rel="stylesheet" href="assets/css/Material-Card.css">
     <link rel="stylesheet" href="controls/DataTables/datatables.min.css">
 </head>
-
 <body>
     <div class="container">
         <div class="col-md-3">
             <div class="card">
                 <div class="card-content">
-                    <p><strong><?= viewdata1("tb_peg", "id", $_SESSION['nama'], "nama");?></strong></p><span>
-                        <?= $_SESSION['nama'];?>
-                        </span>
-                        <span>
-                        </span></div>
+                    <p><strong><?= viewdata1("tb_peg", "id", $_SESSION['nama'], "nama"); ?></strong></p>
+                    <span><?= $_SESSION['nama']; ?></span>
+                </div>
             </div>
             <div class="card">
                 <div class="card-content">
                     <ul class="nav nav-pills nav-stacked">
-                        <li class=<?= $one; ?>><a href="?admin=dashboard">Beranda</a></li>
-                        <?php
-                            if(@$_SESSION['auth'])
-                            {
-
-                            ?>
-                        <li class=<?= $two; ?>><a href="?admin=user">Kontrol Pengguna</a></li>
-                        <li><a href="controls/log.txt" target="_blank">Riwayat penggunaan</a></li>
-                        <li class=<?= $five; ?>><a href="?admin=dinas">Daftar OPD</a></li>
-
-                        <?php
-                            }
-                        ?>
-                        <li class=<?= $three; ?>><a href="?admin=dataset">Dataset</a></li>
-                        <!-- <li class=<?= $four; ?>><a href="?admin=forms">Form</a></li> -->
+                        <li class="<?= $navItems['dashboard']; ?>"><a href="?admin=dashboard">Beranda</a></li>
+                        <?php if (isset($_SESSION['auth']) && $_SESSION['auth']): ?>
+                            <li class="<?= $navItems['user']; ?>"><a href="?admin=user">Kontrol Pengguna</a></li>
+                            <li><a href="controls/log.txt" target="_blank">Riwayat penggunaan</a></li>
+                            <li class="<?= $navItems['dinas']; ?>"><a href="?admin=dinas">Daftar OPD</a></li>
+                        <?php endif; ?>
+                        <li class="<?= $navItems['dataset']; ?>"><a href="?admin=dataset">Dataset</a></li>
                         <li><a href="out.php">Logout</a></li>
                     </ul>
                 </div>
@@ -90,96 +79,90 @@
             <div class="card">
                 <div class="card-content">
                     <?php
-                        if (@$_GET['admin']=='' || @$_GET['admin']=='dashboard')
-                        {
-                            include 'view\mainpage.php';
-                        }else if (@$_GET['admin']=='edit-user')
-                        {
-                            include 'view\user-edit.php';
-                        }else if (@$_GET['admin']=='dataset-edit')
-                        {
-                            include 'view\dataset-edit.php';
-                        }else if (@$_GET['admin']=='form-edit')
-                        {
-                            include 'view\form-edit.php';
-                        }else if (@$_GET['admin']=='opd-edit')
-                        {
-                            include 'view\opd-edit.php';
-                        }else if (@$_GET['admin']=='edit-peg')
-                        {
-                            include 'view\edit-peg.php';
-                        }else if (@$_GET['admin']=='data')
-                        {
-                            include 'view\data-list.php';
-                        }
-                        else if (@$_GET['admin']=='dataset')
-                        {
-                            include 'view\dataset-list.php';
-                        }else if (@$_GET['admin']=='dinas')
-                        {
-                            if (@$_SESSION['auth'])
-                            {
-                                include 'view\opd-list.php';
-                            }else
-                            {
+                    switch ($currentPage) {
+                        case 'dashboard':
+                            includeView('mainpage');
+                            break;
+                        case 'edit-user':
+                            includeView('user-edit');
+                            break;
+                        case 'dataset-edit':
+                            includeView('dataset-edit');
+                            break;
+                        case 'form-edit':
+                            includeView('form-edit');
+                            break;
+                        case 'opd-edit':
+                            includeView('opd-edit');
+                            break;
+                        case 'edit-peg':
+                            includeView('edit-peg');
+                            break;
+                        case 'data':
+                            includeView('data-list');
+                            break;
+                        case 'dataset':
+                            includeView('dataset-list');
+                            break;
+                        case 'dinas':
+                            if (isset($_SESSION['auth']) && $_SESSION['auth']) {
+                                includeView('opd-list');
+                            } else {
                                 include 'errorpage';
                             }
-                        }else if(@$_GET['admin'] =='peg')
-                        {
-                            include 'view/pegawai-list.php';
-                        }else if(@$_GET['admin'] =='user')
-                        {
-                            if (@$_SESSION['auth'])
-                            {
-                                include 'view/user-list.php';
-                            }else
-                            {
+                            break;
+                        case 'peg':
+                            includeView('pegawai-list');
+                            break;
+                        case 'user':
+                            if (isset($_SESSION['auth']) && $_SESSION['auth']) {
+                                includeView('user-list');
+                            } else {
                                 include 'errorpage';
                             }
-                        }else if (@$_GET['admin'] == 'forms')
-                        {
-                            include 'view/form-list.php';
-                        }
-                        else{
-                            echo "<h1>404 Halaman tidak ditemukan</h1>";
-                        }
+                            break;
+                        case 'forms':
+                            includeView('form-list');
+                            break;
+                        default:
+                            echo "<h1>404 Page Not Found</h1>";
+                    }
                     ?>
                 </div>
             </div>
 
-            
-                    <?php
+            <?php
+            $action = $_GET['action'] ?? '';
+            switch ($action) {
+                case 'newdataset':
+                    includeView('formdataset');
+                    break;
+                case 'newopd':
+                    includeView('formopd');
+                    break;
+                case 'newpegawai':
+                    includeView('formpeg');
+                    break;
+                case 'newuser':
+                    includeView('formuser');
+                    break;
+                case 'newform':
+                    includeView('newdataform');
+                    break;
+            }
 
-                    if (@$_GET['action'] == 'newdataset')
-                    {
-                        include 'view/formdataset.php';
-                    }else if (@$_GET['action'] == 'newopd')
-                    {
-                        include 'view/formopd.php';
-                    }else if (@$_GET['action'] == 'newpegawai')
-                    {
-                        include 'view/formpeg.php';
-                    }else if (@$_GET['action'] == 'newuser')
-                    {
-                        include 'view/formuser.php';
-                    }else if (@$_GET['action'] == 'newform')
-                    {
-                        include 'view/newdataform.php';
-                    }else if (@$_GET['q'] >0)
-                    {
-                        include 'view/form-new.php';
-                    }
-                    ?>
+            if (isset($_GET['q']) && $_GET['q'] > 0) {
+                includeView('form-new');
+            }
+            ?>
         </div>
     </div>
     <div class="well well-lg"><span>adminpanel @rioPutra-2018</span></div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    
     <script src="controls/DataTables/datatables.min.js"></script>
     <script>
         $('.table').DataTable();
     </script>
 </body>
-
 </html>

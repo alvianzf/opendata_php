@@ -1,9 +1,15 @@
 <?php
 
 include '../config/config.php';
+include '../functions/sql.php';
 
-$item = @$_POST['search'];
+$searchTerm = $_POST['search'] ?? '';
 
-$qry = mysql_fetch_assoc(mysql_query("SELECT * FROM tb_dataset"));
+$datasets = fetchAll('tb_dataset');
 
-echo  $qry;
+if ($datasets && mysql_num_rows($datasets) > 0) {
+    $firstDataset = mysql_fetch_assoc($datasets);
+    echo json_encode($firstDataset);
+} else {
+    echo "No datasets found.";
+}
