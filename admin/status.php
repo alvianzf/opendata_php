@@ -3,27 +3,27 @@
 include "../functions/sql.php";
 include "../config/config.php";
 
-function logLogin($userId) {
-    $date = date('d-m-Y H:i:s');
-    $logMessage = "[info] - login. id_peg: $userId di $date";
-    $logFile = "../admin/controls/log.txt";
+function logUserLogin($employeeId) {
+    $currentDateTime = date('Y-m-d H:i:s');
+    $logMessage = "[info] - login. Employee ID: $employeeId at $currentDateTime";
+    $logFilePath = "../admin/controls/log.txt";
 
-    if (file_put_contents($logFile, $logMessage . PHP_EOL, FILE_APPEND) === false) {
-        error_log("Failed to write to log file: $logFile");
+    if (file_put_contents($logFilePath, $logMessage . PHP_EOL, FILE_APPEND) === false) {
+        error_log("Failed to write to log file: $logFilePath");
     }
 }
 
 if (isset($_GET['r']) && isset($_GET['u'])) {
     session_start();
 
-    $userId = $_GET['u'];
-    $auth = viewdata1('tb_user', 'id_peg', $userId, 'auth');
+    $employeeId = $_GET['u'];
+    $userAuthLevel = viewdata1('tb_user', 'id_peg', $employeeId, 'auth');
 
-    $_SESSION['nama'] = $userId;
-    $_SESSION['auth'] = $auth;
-    $_SESSION['log'] = 1;
+    $_SESSION['employeeName'] = $employeeId;
+    $_SESSION['authLevel'] = $userAuthLevel;
+    $_SESSION['isLoggedIn'] = 1;
 
-    logLogin($userId);
+    logUserLogin($employeeId);
 
     header("Location: ../admin");
     exit();

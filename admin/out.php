@@ -1,18 +1,18 @@
 <?php
 session_start();
 
-function logLogout($userId) {
-    $date = date('d-m-Y H:i:s');
-    $logMessage = "[info] - id_peg: $userId [logout] di $date";
-    $logFile = "../admin/controls/log.txt";
+function logUserLogout($employeeId) {
+    $currentDateTime = date('Y-m-d H:i:s');
+    $logEntry = "[INFO] Employee ID: $employeeId logged out at $currentDateTime";
+    $logFilePath = "../admin/controls/user_activity.log";
 
-    if (file_put_contents($logFile, $logMessage . PHP_EOL, FILE_APPEND) === false) {
-        error_log("Failed to write to log file: $logFile");
+    if (file_put_contents($logFilePath, $logEntry . PHP_EOL, FILE_APPEND) === false) {
+        error_log("Failed to write to user activity log: $logFilePath");
     }
 }
 
-if (isset($_SESSION['nama'])) {
-    logLogout($_SESSION['nama']);
+if (isset($_SESSION['employeeId'])) {
+    logUserLogout($_SESSION['employeeId']);
 }
 
 session_destroy();
