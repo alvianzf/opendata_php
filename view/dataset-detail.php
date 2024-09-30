@@ -1,15 +1,15 @@
 <?php
 
-$id = @$_GET['i'];
+$datasetId = @$_GET['i'];
 
-$qry = viewdata('tb_form', 'id_dataset', $id);
-$det = mysql_fetch_assoc(mysql_query("SELECT * FROM tb_dataset WHERE id = $id"));
+$formQuery = viewdata('tb_form', 'id_dataset', $datasetId);
+$datasetDetails = mysql_fetch_assoc(mysql_query("SELECT * FROM tb_dataset WHERE id = $datasetId"));
 ?>
 
 <div class="container">
     <div class="row">
-    <h3><?= $det['nama_dataset'];?></h3>
-    <p><?= $det['keterangan'];?></p>
+    <h3><?= $datasetDetails['nama_dataset']; ?></h3>
+    <p><?= $datasetDetails['keterangan']; ?></p>
     <table class="table table-condensed table-hover table-bordered">
         <thead>
             <th>No</th>
@@ -19,20 +19,20 @@ $det = mysql_fetch_assoc(mysql_query("SELECT * FROM tb_dataset WHERE id = $id"))
         <tbody>
 
             <?php
-            $i = 1;
+            $rowNumber = 1;
             
-            while ($data = mysql_fetch_assoc($qry))
+            while ($formData = mysql_fetch_assoc($formQuery))
             {
                 ?>
                     <tr>
-                    <td><?= $i;?></td>
-                    <td><?=$data['nama_form'];?></td>
-                    <td><?= $data['deskripsi'];?></td>
+                    <td><?= $rowNumber; ?></td>
+                    <td><?= $formData['nama_form']; ?></td>
+                    <td><?= $formData['deskripsi']; ?></td>
                     </tr>
 
                 <?php
 
-                $i++;
+                $rowNumber++;
             }
             ?>
         </tbody>

@@ -6,29 +6,29 @@
                 <!-- start dataset -->
                 <?php
 
-                $dataset = where("tb_dataset");
+                $datasets = where("tb_dataset");
                                         
-                $i=0;
-                while ($data = mysql_fetch_assoc($dataset) AND $i <20)
+                $datasetCount = 0;
+                while ($currentDataset = mysql_fetch_assoc($datasets) && $datasetCount < 20)
                 {
                     ?>
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><a href="?i=<?=$data['id'];?>"><?= $data['nama_dataset'];?></a></h3>
+                        <h3 class="panel-title"><a href="?i=<?=$currentDataset['id'];?>"><?= $currentDataset['nama_dataset'];?></a></h3>
                     </div>
                     <div class="panel-body"><span><a href="#">
 
                         <?php
-                            $id = $data['id'];
+                            $datasetId = $currentDataset['id'];
 
-                            $q= 0;
-                            $qry = viewdata('tb_form', 'id_dataset', $id);
-                            while($form = mysql_fetch_assoc($qry) AND $q<5)
+                            $formCount = 0;
+                            $formQuery = viewdata('tb_form', 'id_dataset', $datasetId);
+                            while($currentForm = mysql_fetch_assoc($formQuery) && $formCount < 5)
                             {
-                                    echo '<a href="?q='.$form['id'].'">';
-                                    echo $form['nama_form'];
+                                    echo '<a href="?q='.$currentForm['id'].'">';
+                                    echo $currentForm['nama_form'];
                                     echo '</a> <br/>';
-                                    $q++;
+                                    $formCount++;
                                 
                             }
                             ?>
@@ -37,7 +37,7 @@
                 </div>
 
                 <?php
-                $i++;
+                $datasetCount++;
                 }
                 ?>
                 <!-- end dataset -->

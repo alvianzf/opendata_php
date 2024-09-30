@@ -1,26 +1,25 @@
 <?php
 
-$id = @$_GET['q'];
+$formId = @$_GET['q'];
 
-$qry = viewdata('tb_fields', 'id_form', $id);
-$det = mysql_fetch_assoc($qry);
+$fieldsQuery = viewdata('tb_fields', 'id_form', $formId);
+$formDetails = mysql_fetch_assoc($fieldsQuery);
 ?>
 
 <div class="container">
 
 <?php
 
-$nama = viewdata1('tb_form', 'id', $id, 'nama_form');
+$formName = viewdata1('tb_form', 'id', $formId, 'nama_form');
+$formDescription = viewdata1('tb_form', 'id', $formId, 'deskripsi');
 
-$deskripsi = viewdata1('tb_form', 'id', $id, 'deskripsi');
-
-echo '<h4>'.$nama.'</h4>';
-echo '<p>'.$deskripsi.'</p>';
+echo '<h4>' . $formName . '</h4>';
+echo '<p>' . $formDescription . '</p>';
 
 ?>
 <br/>
 
-<a href="admin/controls/print-data.php?id=<?= $id;?>" class="btn btn-primary pull-right">Cetak PDF</a>
+<a href="admin/controls/print-data.php?id=<?= $formId; ?>" class="btn btn-primary pull-right">Cetak PDF</a>
 <br/>
 <br/>
 
@@ -32,14 +31,14 @@ echo '<p>'.$deskripsi.'</p>';
             <!-- populate data -->
             <?php
 
-            $qry = mysql_query("SELECT * FROM tb_fields WHERE id_form = $id");
-            while($data = mysql_fetch_assoc($qry))
+            $headerQuery = mysql_query("SELECT * FROM tb_fields WHERE id_form = $formId");
+            while($headerData = mysql_fetch_assoc($headerQuery))
             {
                 echo '<th>';
-                echo $data['value'];
+                echo $headerData['value'];
                 echo '</th>';
             }
-                ?>ia
+                ?>
 
                 </tr>
             </thead>
@@ -49,30 +48,30 @@ echo '<p>'.$deskripsi.'</p>';
 
           <?php
 
-                $sql = mysql_query("SELECT tb_fields.id_form, tb_values.value, tb_values.timestamp FROM tb_values INNER JOIN tb_fields ON tb_fields.id = tb_values.id_field WHERE id_form = $id ORDER BY timestamp");
-                $no =1;
+                $valuesQuery = mysql_query("SELECT tb_fields.id_form, tb_values.value, tb_values.timestamp FROM tb_values INNER JOIN tb_fields ON tb_fields.id = tb_values.id_field WHERE id_form = $formId ORDER BY timestamp");
+                $rowNumber = 1;
 
-                $o = mysql_fetch_assoc($sql);
+                $firstRow = mysql_fetch_assoc($valuesQuery);
 
-                $temp = date("Y-m-d H:i:s");
+                $currentTimestamp = date("Y-m-d H:i:s");
 
-                while($loop = mysql_fetch_assoc($sql))
+                while($row = mysql_fetch_assoc($valuesQuery))
                 {
 
-                    $waktu = $loop['timestamp'];
-                    if($temp == $loop['timestamp'])
+                    $rowTimestamp = $row['timestamp'];
+                    if($currentTimestamp == $row['timestamp'])
                     {
                     
-                        $temp = $waktu;
+                        $currentTimestamp = $rowTimestamp;
                     }else{
-                        $temp = $waktu;
-                        $query = mysql_query("SELECT * FROM tb_values WHERE timestamp = '$waktu'");
-                        echo '<td>'.$no.'</td>';
-                        $no++;
+                        $currentTimestamp = $rowTimestamp;
+                        $cellQuery = mysql_query("SELECT * FROM tb_values WHERE timestamp = '$rowTimestamp'");
+                        echo '<td>' . $rowNumber . '</td>';
+                        $rowNumber++;
 
-                        while($table = mysql_fetch_assoc($query))
+                        while($cellData = mysql_fetch_assoc($cellQuery))
                         {
-                            echo '<td>'.$table['value'].'</td>';
+                            echo '<td>' . $cellData['value'] . '</td>';
                         }
                     }
                     echo '</tr>';
