@@ -13,26 +13,25 @@
             <!-- populate data -->
             <?php
 
-            $i = 1;
-            $sql = where('tb_opd');
-            while($data = mysql_fetch_assoc($sql))
+            $rowNumber = 1;
+            $opdRecords = where('tb_opd');
+            while($opdData = mysql_fetch_assoc($opdRecords))
             {
-
-                $id = $data['id'];
+                $opdId = $opdData['id'];
                 ?>
                 <tr>
-                    <td><?= $i; ?></td>
-                    <td><?= $data['nama_opd'];?></td>
-                    <td><?= $data['singkatan'];?></td>
+                    <td><?= $rowNumber; ?></td>
+                    <td><?= $opdData['nama_opd']; ?></td>
+                    <td><?= $opdData['singkatan']; ?></td>
                     <td>
-                    <a href="?admin=opd-edit&id=<?= $data['id'];?>">
+                    <a href="?admin=opd-edit&id=<?= $opdData['id']; ?>">
                         <button class="btn btn-success" name="edit">Edit</button>
                     </a>
-                        <a href="controls/delete.php?table=tb_opd&source=dinas&id=<?= $id; ?>"><button class="btn btn-danger" name="delete">Delete</button></a>
+                        <a href="controls/delete.php?table=tb_opd&source=dinas&id=<?= $opdId; ?>"><button class="btn btn-danger" name="delete">Delete</button></a>
                     </td>
                 </tr>
                 <?php
-                $i++;                
+                $rowNumber++;                
             }
                 ?>
             </tbody>

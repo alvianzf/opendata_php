@@ -16,32 +16,31 @@
             <!-- populate data -->
             <?php
 
-            $i = 1;
-            $sql = where('tb_user');
-            while($data = mysql_fetch_assoc($sql))
+            $rowNumber = 1;
+            $userQuery = where('tb_user');
+            while($userData = mysql_fetch_assoc($userQuery))
             {
-
-                $id = $data['id_peg'];
-                $idd= $data['id'];
-                $opd= viewdata1('tb_peg', 'id', $id, 'id_opd');
+                $employeeId = $userData['id_peg'];
+                $userId = $userData['id'];
+                $opdId = viewdata1('tb_peg', 'id', $employeeId, 'id_opd');
                 ?>
                 <tr>
-                    <td><?= $i; ?></td>
-                    <td><?= $data['id_peg'];?></td>
-                    <td><?= viewdata1('tb_peg', 'id', $id, 'nama');?></td>
-                    <td><?= $data['password'];?></td>
-                    <td><?= viewdata1('tb_opd', 'id', $opd, 'nama_opd');?></td>
+                    <td><?= $rowNumber; ?></td>
+                    <td><?= $userData['id_peg']; ?></td>
+                    <td><?= viewdata1('tb_peg', 'id', $employeeId, 'nama'); ?></td>
+                    <td><?= $userData['password']; ?></td>
+                    <td><?= viewdata1('tb_opd', 'id', $opdId, 'nama_opd'); ?></td>
                     <td>
-                    <a href="?admin=edit-user&id=<?= $data['id_peg'];?>">
+                    <a href="?admin=edit-user&id=<?= $userData['id_peg']; ?>">
                         <button class="btn btn-success" name="edit">Edit</button>
                         </a>
-                        <a href="controls/delete.php?table=tb_user&source=user&id=<?= $idd ?>" >
+                        <a href="controls/delete.php?table=tb_user&source=user&id=<?= $userId ?>" >
                             <button class="btn btn-danger" name="delete">Delete</button>
                         </a>
                     </td>
                 </tr>
                 <?php
-                $i++;                
+                $rowNumber++;                
             }
                 ?>
             </tbody>

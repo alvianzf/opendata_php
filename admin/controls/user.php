@@ -1,24 +1,31 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
+session_start();
 
-    $nip        = @$_POST['nip'];
-    $password   = @$_POST['password'];
-    $opd        = @$_POST['opd'];
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
+}
 
-    $ins = insert('tb_user', "NULL,'$nip','$password',0");
+function logUserCreation($user, $nip, $date) {
+    $logMessage = "[info] - id_peg: $user [tambah pengguna] $nip di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
-    $date = date('d-m-Y H:i:s');
+function insertUser($nip, $password) {
+    return insert('tb_user', "NULL,'$nip','$password',0");
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [tambah pengguna] " .$nip. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+$nip = getPostParameter('nip');
+$password = getPostParameter('password');
+$opd = getPostParameter('opd');
 
-    echo $nip;
-    echo $password;
-    echo $opd;
-    header("location:../index.php?admin=user");
+insertUser($nip, $password);
+
+$date = date('d-m-Y H:i:s');
+logUserCreation($_SESSION['nama'], $nip, $date);
+
+header("Location: ../index.php?admin=user");
+exit();
 ?>

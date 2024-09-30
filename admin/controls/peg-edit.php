@@ -1,22 +1,48 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
+session_start();
 
-    $nama_peg     = @$_POST['nama'];
-    $nip          = @$_GET['id'];
-    $jabatan      = @$_POST['jabatan'];
-    $opd          = @$_POST['opd'];
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
+}
 
-    $date = date('d-m-Y H:i:s');
+function getGetParameter($key, $default = null) {
+    return $_GET[$key] ?? $default;
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [ubah pegawai] " .$nip. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+function logPegEdit($user, $nip, $date) {
+    $logMessage = "[info] - id_peg: $user [ubah pegawai] $nip di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
-    $ins = mysql_query("UPDATE tb_peg SET nama= '$nama_peg', jabatan= '$jabatan', id_opd='$opd' WHERE id=$nip");
+function updatePeg($nip, $data) {
+    $setClause = implode(', ', array_map(function ($key, $value) {
+        return "$key = '" . mysqli_real_escape_string($GLOBALS['connection'], $value) . "'";
+    }, array_keys($data), $data));
     
-    header("location:../index.php?admin=peg");
+    $query = "UPDATE tb_peg SET $setClause WHERE id = ?";
+    $stmt = mysqli_prepare($GLOBALS['connection'], $query);
+    mysqli_stmt_bind_param($stmt, "s", $nip);
+    return mysqli_stmt_execute($stmt);
+}
+
+$data = [
+    'nama' => getPostParameter('nama'),
+    'jabatan' => getPostParameter('jabatan'),
+    'id_opd' => getPostParameter('opd')
+];
+$nip = getGetParameter('id');
+
+$date = date('d-m-Y H:i:s');
+logPegEdit($_SESSION['nama'], $nip, $date);
+
+if (updatePeg($nip, $data)) {
+    header("Location: ../index.php?admin=peg");
+    exit();
+} else {
+    // Handle error
+    echo "Error updating employee";
+}
 ?>

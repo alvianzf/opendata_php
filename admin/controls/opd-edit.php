@@ -1,21 +1,42 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
+session_start();
 
-    $nama_opd     = @$_POST['nama'];
-    $singkatan    = @$_POST['singkatan'];
-    $nip          = @$_GET['id'];
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
+}
 
-    $date = date('d-m-Y H:i:s');
+function getGetParameter($key, $default = null) {
+    return $_GET[$key] ?? $default;
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [ubah opd] " .$nama_opd. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+function logOpdEdit($user, $opdName, $date) {
+    $logMessage = "[info] - id_peg: $user [ubah opd] $opdName di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
-    $ins = mysql_query("UPDATE tb_opd SET nama_opd= '$nama_opd', singkatan='$singkatan' WHERE id= $nip");
-    
-    header("location:../index.php?admin=dinas");
+function updateOpd($id, $nama_opd, $singkatan) {
+    $query = "UPDATE tb_opd SET nama_opd = ?, singkatan = ? WHERE id = ?";
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, "ssi", $nama_opd, $singkatan, $id);
+    return mysqli_stmt_execute($stmt);
+}
+
+$nama_opd = getPostParameter('nama');
+$singkatan = getPostParameter('singkatan');
+$id = getGetParameter('id');
+
+$date = date('d-m-Y H:i:s');
+
+logOpdEdit($_SESSION['nama'], $nama_opd, $date);
+
+if (updateOpd($id, $nama_opd, $singkatan)) {
+    header("Location: ../index.php?admin=dinas");
+    exit();
+} else {
+    // Handle error
+    echo "Error updating OPD";
+}
 ?>

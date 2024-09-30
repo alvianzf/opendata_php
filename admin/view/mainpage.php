@@ -1,32 +1,32 @@
-<h4>Data statistik sampai saat ini:</h4>
+<h4>Statistik Data Terkini:</h4>
 
 <table class="table table-condensed table-hover">
     <thead>
-        <th width="5%">No</th>
-        <th>Item</th>
-        <th width="20%"><center>Statistik</center></th>
+        <tr>
+            <th width="5%">No</th>
+            <th>Kategori</th>
+            <th width="20%"><center>Jumlah</center></th>
+        </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>1</td>
-            <td>Dataset</td>
-            <td><center><?= hitung('tb_dataset'); ?></center></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Data</td>
-            <td><center><?= hitung('tb_form'); ?></center></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Organisasi Perangkat Daerah</td>
-            <td><center><?= hitung('tb_opd'); ?></center></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Jumlah Pengguna</td>
-            <td><center><?= hitung('tb_user'); ?></center></td>
-        </tr>
+        <?php
+        $statistik_items = [
+            ['Dataset', 'tb_dataset'],
+            ['Data', 'tb_form'],
+            ['Organisasi Perangkat Daerah', 'tb_opd'],
+            ['Pengguna', 'tb_user']
+        ];
 
+        foreach ($statistik_items as $index => $item) {
+            $nomor = $index + 1;
+            $kategori = $item[0];
+            $tabel = $item[1];
+            echo "<tr>
+                <td>{$nomor}</td>
+                <td>{$kategori}</td>
+                <td><center>" . hitung($tabel) . "</center></td>
+            </tr>";
+        }
+        ?>
     </tbody>
 </table>

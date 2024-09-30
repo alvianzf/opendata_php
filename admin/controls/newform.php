@@ -1,10 +1,22 @@
 <?php
 
-$q = @$_POST['tables'];
-$id = @$_GET['id'];
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-header('location: ../index.php?admin=forms&id='.$id.'&q='.$q);
+session_start();
 
-echo $id;
+function getParameter($method, $key, $default = null) {
+    return $method === 'POST' ? ($_POST[$key] ?? $default) : ($_GET[$key] ?? $default);
+}
+
+function redirectToForms($id, $q) {
+    header("Location: ../index.php?admin=forms&id=$id&q=$q");
+    exit();
+}
+
+$q = getParameter('POST', 'tables');
+$id = getParameter('GET', 'id');
+
+redirectToForms($id, $q);
 
 ?>

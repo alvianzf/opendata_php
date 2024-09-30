@@ -1,22 +1,32 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
-    
-    $nama_peg     = @$_POST['nama'];
-    $nip          = @$_POST['nip'];
-    $jabatan      = @$_POST['jabatan'];
-    $opd          = @$_POST['opd'];
+session_start();
 
-    $ins = insert('tb_peg', "'$nip','$nama_peg','$jabatan',$opd");
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
+}
 
-	$date = date('d-m-Y H:i:s');
+function logPegCreation($user, $nip, $date) {
+    $logMessage = "[info] - id_peg: $user [tambah pegawai] $nip di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [tambah pegawai] " .$nip. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+function insertPeg($nip, $nama_peg, $jabatan, $opd) {
+    return insert('tb_peg', "'$nip','$nama_peg','$jabatan',$opd");
+}
 
-    header("location:../index.php?admin=peg");
+$nama_peg = getPostParameter('nama');
+$nip = getPostParameter('nip');
+$jabatan = getPostParameter('jabatan');
+$opd = getPostParameter('opd');
+
+insertPeg($nip, $nama_peg, $jabatan, $opd);
+
+$date = date('d-m-Y H:i:s');
+logPegCreation($_SESSION['nama'], $nip, $date);
+
+header("Location: ../index.php?admin=peg");
+exit();
 ?>

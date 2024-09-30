@@ -1,33 +1,51 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
+session_start();
 
-$namaForm   = @$_POST['namaForm'];
-$deskripsi  = @$_POST['deskripsi'];
-$id = @$_POST['id'];
-
-insert('tb_form', "NULL, '$namaForm ',' $deskripsi ',' $id'");
-
-$form_id = mysql_fetch_assoc(mysql_query("SELECT * FROM tb_form WHERE id_dataset = $id ORDER BY id DESC"));
-
-$id_form = $form_id['id'];
-
-	$date = date('d-m-Y H:i:s');
-
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [tambah form] " .$namaForm. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
-
-foreach (@$_POST['value'] as $value)
-{
-   echo mysql_query("INSERT INTO tb_fields VALUES (NULL, '$id_form', '$value')");
-   echo $id_form. ' - ' .$value. '<br/>';
-   echo $id. '<br/>';
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
 }
 
-header('location: ../index.php?admin=forms&id='.$id);
+function insertForm($namaForm, $deskripsi, $id) {
+    return insert('tb_form', "NULL, '$namaForm', '$deskripsi', '$id'");
+}
 
+function getLastInsertedFormId($id) {
+    $query = "SELECT id FROM tb_form WHERE id_dataset = ? ORDER BY id DESC LIMIT 1";
+    $result = mysqli_query($connection, $query);
+    return mysqli_fetch_assoc($result)['id'];
+}
+
+function logFormCreation($user, $formName, $date) {
+    $logMessage = "[info] - id_peg: $user [tambah form] $formName di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
+
+function insertFields($id_form, $values) {
+    foreach ($values as $value) {
+        $query = "INSERT INTO tb_fields VALUES (NULL, ?, ?)";
+        $stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($stmt, "is", $id_form, $value);
+        mysqli_stmt_execute($stmt);
+    }
+}
+
+$namaForm = getPostParameter('namaForm');
+$deskripsi = getPostParameter('deskripsi');
+$id = getPostParameter('id');
+
+insertForm($namaForm, $deskripsi, $id);
+
+$id_form = getLastInsertedFormId($id);
+
+$date = date('d-m-Y H:i:s');
+logFormCreation($_SESSION['nama'], $namaForm, $date);
+
+$values = getPostParameter('value', []);
+insertFields($id_form, $values);
+
+header("Location: ../index.php?admin=forms&id=$id");
+exit();
 ?>

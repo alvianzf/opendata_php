@@ -1,20 +1,30 @@
 <?php
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
-    
-    $nama_opd   = @$_POST['nama'];
-    $singkatan  = @$_POST['singkatan'];
+session_start();
 
-	$date = date('d-m-Y H:i:s');
+function getPostParameter($key, $default = null) {
+    return $_POST[$key] ?? $default;
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [tambah opd] " .$nama_opd. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+function logOpdCreation($user, $opdName, $date) {
+    $logMessage = "[info] - id_peg: $user [tambah opd] $opdName di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
+function insertOpd($nama_opd, $singkatan) {
+    return insert('tb_opd', "NULL, '$nama_opd', '$singkatan'");
+}
 
-    $ins = insert('tb_opd', "NULL,'$nama_opd','$singkatan'");
-    header("location:../index.php?admin=dinas");
+$nama_opd = getPostParameter('nama');
+$singkatan = getPostParameter('singkatan');
+$date = date('d-m-Y H:i:s');
+
+logOpdCreation($_SESSION['nama'], $nama_opd, $date);
+
+insertOpd($nama_opd, $singkatan);
+
+header("Location: ../index.php?admin=dinas");
+exit();
 ?>

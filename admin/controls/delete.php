@@ -1,26 +1,33 @@
 <?php
 
-    include '../../config/config.php';
-    include '../../functions/sql.php';
+include '../../config/config.php';
+include '../../functions/sql.php';
 
-    session_start();
+session_start();
 
-    $tbname = @$_GET['table'];
-    $id     = @$_GET['id'];
-    $src    = @$_GET['source'];
+function deleteRecord($table, $id) {
+    delete($table, $id);
+}
 
-    delete($tbname, $id);
-
+function logDeletion($userId, $table, $id) {
     $date = date('d-m-Y H:i:s');
+    $logMessage = "[info] - id_peg: $userId [hapus data] pada tabel:$table dengan id value:$id di $date\n";
+    file_put_contents("log.txt", $logMessage, FILE_APPEND);
+}
 
-    $myfile = fopen("log.txt", "a") or die("Unable to open file!");
-    $txt = "[info] - id_peg: ".$_SESSION['nama'].  " [hapus data] pada tabel:".$tbname." dengan id value:" .$id. " di " .$date;
-    fwrite($myfile, "\n". $txt);
-    fclose($myfile);
+$table = $_GET['table'] ?? '';
+$id = $_GET['id'] ?? '';
+$source = $_GET['source'] ?? '';
 
-    header('location:../?admin='.$src);
+if ($table && $id) {
+    deleteRecord($table, $id);
+    logDeletion($_SESSION['nama'], $table, $id);
+    
+    header("Location: ../?admin=$source");
+    exit();
+} else {
+    // Handle error: missing parameters
+    echo "Error: Missing table or id parameter";
+}
 
-    echo $tbname;
-    echo $id;
-    echo $src;
 ?>
